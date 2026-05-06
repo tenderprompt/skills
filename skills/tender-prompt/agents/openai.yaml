@@ -1,0 +1,6 @@
+interface:
+  display_name: "Tender Prompt"
+  short_description: "Edit, preview, publish, and inspect Tender Apps"
+  default_prompt: "Use $tender-prompt to update this Tender App, validate it, push through artifact Git, watch the preview, and use the Tender CLI for analytics when needed."
+policy:
+  allow_implicit_invocation: true
