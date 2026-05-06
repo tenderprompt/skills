@@ -125,6 +125,8 @@ tender app analytics capabilities <artifact-id> --include-catalog --range 30d --
 Then inspect local source code for analytics calls such as
 `__TP_ANALYTICS.invoke(...)`, propose a chart spec, validate it with
 `tender app analytics query`, and only save it after a successful query.
+When adding or changing analytics events, register intended dashboard dimensions
+and metrics early so meaningful traffic is queryable from the start.
 
 Read [Analytics CLI workflow](references/analytics-cli.md) before creating,
 exporting, or saving analytics dashboards for a customer.

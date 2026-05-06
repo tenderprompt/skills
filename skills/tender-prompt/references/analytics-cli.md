@@ -57,6 +57,53 @@ in observed data from `capabilities --include-catalog`. A source call that has
 never produced observed events is a weak suggestion unless the user explicitly
 wants to prepare for future traffic.
 
+## Dashboard-Queryable Properties
+
+Event payload properties move through three states:
+
+- Tracked: the app sent the property in an analytics event payload.
+- Observed: the bounded catalog saw the property in sampled analytics data.
+- Queryable: dashboards can group or aggregate by that property.
+
+When adding analytics events, identify properties that should be used in charts
+and make them queryable before meaningful traffic starts. This avoids gaps in
+fast dashboard-query coverage for early traffic.
+
+Use dimensions for low-cardinality grouping values such as variant, plan, step,
+source, or outcome:
+
+```bash
+tender app analytics properties activate <artifact-id> \
+  --event <event-name> \
+  --property <property-key> \
+  --type dimension \
+  --dry-run \
+  --json
+```
+
+Use metrics for numeric values used in sums or averages such as score, amount,
+duration, or quantity:
+
+```bash
+tender app analytics properties activate <artifact-id> \
+  --event <event-name> \
+  --property <property-key> \
+  --type metric \
+  --dry-run \
+  --json
+```
+
+After the dry run looks correct, run the same command without `--dry-run`.
+
+Do not make every property queryable. Avoid PII, secrets, free text, ids, URLs,
+or high-cardinality values unless the user explicitly wants that analysis and
+the chart has a clear purpose.
+
+Making a property queryable does not require an app redeploy. Properties that
+were tracked before activation may appear in catalog samples, but older fast
+dashboard-query rows may not fully populate grouped charts until new traffic
+arrives.
+
 ## Read-Only Commands
 
 ```bash
