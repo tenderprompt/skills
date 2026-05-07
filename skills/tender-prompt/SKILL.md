@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.2"
+  version: "0.1.3"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -14,6 +14,8 @@ metadata:
 Work from a local Tender App checkout, or create one before editing. Edit files
 locally, run checks, commit to Git, push to the artifact remote, watch preview
 builds, inspect analytics, and publish only after explicit user intent.
+For brand-new or empty Tender Apps, use the CLI's API-derived scaffold path; do
+not copy, fork, or borrow another local Tender App as a starting scaffold.
 
 The CLI does not run or message Tender's hosted agent. Treat the CLI as the
 source, lifecycle, and analytics control surface. Do not call Tender HTTP APIs
@@ -58,13 +60,30 @@ environment variables.
 
 To download or start work on an existing app, use `tender app init`. When
 artifact Git source exists it fetches that source and configures the `tender`
-remote. When no source exists yet it writes managed context/scaffold files and
-configures the remote. Use `tender app context fetch` only when a checkout
-already exists and needs fresh agent context.
+remote. Use `tender app context fetch` only when a checkout already exists and
+needs fresh agent context.
+
+For a brand-new Tender App, prefer one command that creates source and starts a
+preview immediately:
+
+```bash
+npm exec --yes @tenderprompt/cli@latest -- app create "<name>" --init --dir <dir> --preview --json
+```
+
+For an existing app with no source yet, initialize it from the API-provided
+scaffold and request a preview:
+
+```bash
+npm exec --yes @tenderprompt/cli@latest -- app init <artifact-id> --dir <dir> --scaffold server-backed --preview --json
+```
+
+The server-owned scaffold is the source of truth for empty apps. Do not copy,
+fork, or borrow another local Tender App checkout as a scaffold.
 
 ## Inside A Tender App Checkout
 
-Inside a checkout, usually after `tender app init <artifact-id> --dir <dir>`:
+Inside a checkout, usually after `tender app create --init --dir <dir> --preview --json`
+or `tender app init <artifact-id> --dir <dir> --scaffold server-backed --preview --json`:
 
 - Read `AGENTS.md` first when it exists.
 - Read relevant `.agents/skills/*/SKILL.md` files before changing runtime,
@@ -161,6 +180,9 @@ exporting, or saving analytics dashboards for a customer.
 ## Troubleshooting
 
 - `missing_typecheck_script`: add `check` or `typecheck` to `package.json`.
+- `empty_or_new_app`: use `tender app create --init ...` or
+  `tender app init ... --scaffold server-backed`; do not copy another local
+  Tender App.
 - `outbound_not_allowed_in_app_server`: move internet access into a binding.
 - `invalid_allowed_host`: use a host like `api.example.com`, not a wildcard,
   URL, port, path, or query string.
