@@ -1,11 +1,11 @@
 ---
 name: tender-prompt
-description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, bootstrap project context, validate locally, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
+description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, bootstrap project context, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
 license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.1"
+  version: "0.1.3"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -14,6 +14,8 @@ metadata:
 Work from a local Tender App checkout, or create one before editing. Edit files
 locally, run checks, commit to Git, push to the artifact remote, watch preview
 builds, inspect analytics, and publish only after explicit user intent.
+For brand-new or empty Tender Apps, use the CLI's API-derived scaffold path; do
+not copy, fork, or borrow another local Tender App as a starting scaffold.
 
 The CLI does not run or message Tender's hosted agent. Treat the CLI as the
 source, lifecycle, and analytics control surface. Do not call Tender HTTP APIs
@@ -58,13 +60,30 @@ environment variables.
 
 To download or start work on an existing app, use `tender app init`. When
 artifact Git source exists it fetches that source and configures the `tender`
-remote. When no source exists yet it writes managed context/scaffold files and
-configures the remote. Use `tender app context fetch` only when a checkout
-already exists and needs fresh agent context.
+remote. Use `tender app context fetch` only when a checkout already exists and
+needs fresh agent context.
+
+For a brand-new Tender App, prefer one command that creates source and starts a
+preview immediately:
+
+```bash
+npm exec --yes @tenderprompt/cli@latest -- app create "<name>" --init --dir <dir> --preview --json
+```
+
+For an existing app with no source yet, initialize it from the API-provided
+scaffold and request a preview:
+
+```bash
+npm exec --yes @tenderprompt/cli@latest -- app init <artifact-id> --dir <dir> --scaffold server-backed --preview --json
+```
+
+The server-owned scaffold is the source of truth for empty apps. Do not copy,
+fork, or borrow another local Tender App checkout as a scaffold.
 
 ## Inside A Tender App Checkout
 
-Inside a checkout, usually after `tender app init <artifact-id> --dir <dir>`:
+Inside a checkout, usually after `tender app create --init --dir <dir> --preview --json`
+or `tender app init <artifact-id> --dir <dir> --scaffold server-backed --preview --json`:
 
 - Read `AGENTS.md` first when it exists.
 - Read relevant `.agents/skills/*/SKILL.md` files before changing runtime,
@@ -74,6 +93,33 @@ Inside a checkout, usually after `tender app init <artifact-id> --dir <dir>`:
 - Keep repo-only context in `AGENTS.md`, `.agents/`, `.tenderprompt/`, docs,
   and tests. These files can be committed but must not become runtime assets.
 - Run `npm run check` or `tender app doctor --dir .` before pushing.
+
+## Workspace Heartbeats
+
+Use the CLI heartbeat command as a lightweight feedback channel back to the
+Tender Prompt workspace. Send one after loading the Tender Prompt context, then
+at meaningful milestones such as exploring, editing, validating, pushing,
+waiting for a preview build, or needing human input.
+
+Keep heartbeats concise and best-effort. They should help the user understand
+what you are doing without blocking the task or sending rapid polling updates.
+
+```bash
+tender app agent heartbeat <artifact-id> --source codex --status connected --summary "Loaded Tender Prompt context" --json
+tender app agent heartbeat <artifact-id> --source codex --status working --phase exploring --summary "Reading the app structure" --json
+tender app agent heartbeat <artifact-id> --source codex --status working --phase editing --summary "Updating app files" --json
+tender app agent heartbeat <artifact-id> --source codex --status needs_attention --summary "Waiting for a decision" --requested-action answer_question --json
+```
+
+Use `--source claude-code` when running from Claude Code. Use `--source other`
+with `--source-label <name>` only when neither Codex nor Claude Code is the
+right identity.
+
+For structured activity details, pass JSON through stdin:
+
+```bash
+tender app agent heartbeat <artifact-id> --input - --json < heartbeat.json
+```
 
 ## Outbound Internet
 
@@ -134,6 +180,9 @@ exporting, or saving analytics dashboards for a customer.
 ## Troubleshooting
 
 - `missing_typecheck_script`: add `check` or `typecheck` to `package.json`.
+- `empty_or_new_app`: use `tender app create --init ...` or
+  `tender app init ... --scaffold server-backed`; do not copy another local
+  Tender App.
 - `outbound_not_allowed_in_app_server`: move internet access into a binding.
 - `invalid_allowed_host`: use a host like `api.example.com`, not a wildcard,
   URL, port, path, or query string.
