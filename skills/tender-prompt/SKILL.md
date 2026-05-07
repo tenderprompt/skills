@@ -1,11 +1,11 @@
 ---
 name: tender-prompt
-description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, bootstrap project context, validate locally, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
+description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, bootstrap project context, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
 license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.1"
+  version: "0.1.2"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -74,6 +74,33 @@ Inside a checkout, usually after `tender app init <artifact-id> --dir <dir>`:
 - Keep repo-only context in `AGENTS.md`, `.agents/`, `.tenderprompt/`, docs,
   and tests. These files can be committed but must not become runtime assets.
 - Run `npm run check` or `tender app doctor --dir .` before pushing.
+
+## Workspace Heartbeats
+
+Use the CLI heartbeat command as a lightweight feedback channel back to the
+Tender Prompt workspace. Send one after loading the Tender Prompt context, then
+at meaningful milestones such as exploring, editing, validating, pushing,
+waiting for a preview build, or needing human input.
+
+Keep heartbeats concise and best-effort. They should help the user understand
+what you are doing without blocking the task or sending rapid polling updates.
+
+```bash
+tender app agent heartbeat <artifact-id> --source codex --status connected --summary "Loaded Tender Prompt context" --json
+tender app agent heartbeat <artifact-id> --source codex --status working --phase exploring --summary "Reading the app structure" --json
+tender app agent heartbeat <artifact-id> --source codex --status working --phase editing --summary "Updating app files" --json
+tender app agent heartbeat <artifact-id> --source codex --status needs_attention --summary "Waiting for a decision" --requested-action answer_question --json
+```
+
+Use `--source claude-code` when running from Claude Code. Use `--source other`
+with `--source-label <name>` only when neither Codex nor Claude Code is the
+right identity.
+
+For structured activity details, pass JSON through stdin:
+
+```bash
+tender app agent heartbeat <artifact-id> --input - --json < heartbeat.json
+```
 
 ## Outbound Internet
 
