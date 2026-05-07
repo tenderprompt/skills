@@ -1,11 +1,11 @@
 ---
 name: tender-prompt
-description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, bootstrap project context, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
+description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, inspect remote session-only playbooks, bootstrap project context, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
 license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.3"
+  version: "0.1.4"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -50,6 +50,31 @@ If you use the global `tender` binary, update it first with
 `npm install -g @tenderprompt/cli@latest`, then run `tender capabilities --json`.
 Treat later `tender ...` examples as shorthand for the latest CLI runner unless
 you have just refreshed the global binary.
+
+For non-trivial Tender App or widget work, inspect remote playbook metadata
+before planning:
+
+```bash
+tender playbooks list --json
+```
+
+Use the metadata only to decide relevance. If a playbook matches the user's
+request, fetch that playbook on demand:
+
+```bash
+tender playbooks get <playbook-id> --json
+```
+
+Fetch individual reference files only when the playbook points to details the
+task needs:
+
+```bash
+tender playbooks file <playbook-id> --path references/<file>.md --json
+```
+
+Do not write playbook contents into the checkout, `.agents/skills`,
+`.tenderprompt`, `~/.tender`, or a persistent cache. Treat returned playbook
+content as session-only context from Tender.
 
 When remote access is needed, authenticate with the device login flow. Use an
 account-scoped token for normal multi-app work. Use `--artifact <artifact-id>`
