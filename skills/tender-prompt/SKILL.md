@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.4"
+  version: "0.1.5"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -145,6 +145,38 @@ For structured activity details, pass JSON through stdin:
 ```bash
 tender app agent heartbeat <artifact-id> --input - --json < heartbeat.json
 ```
+
+## Artifact Memory Notes
+
+Use artifact memory notes as the durable session breadcrumb for a single app or
+artifact. Keep them short, bounded, and useful for a later support or QA
+handoff. Good entries capture:
+
+- intent and user goal
+- what the agent changed
+- validations that ran
+- failures, blockers, or recovery paths
+- follow-up test ideas or open questions
+
+Do not store secrets, full hidden system prompts, provider credentials, raw
+cookies, or unbounded transcripts. If a user asks to drop more context for
+another person or team, add a note with the relevant handoff details and the
+next recovery step.
+
+Example quick start:
+
+```bash
+tender memory add --artifact artifact_123 --kind intent --summary "User wants Help Widget copy change" --body "Updated heading animation, verified local smoke." --tag testing
+tender memory handoff --artifact artifact_123 --reason "Blocked on publish" --json
+tender memory brief --artifact artifact_123 --json
+tender memory show --artifact artifact_123 --json
+```
+
+Good defaults for this phase:
+
+- Use `tender memory flush --artifact <artifact-id> --json` when notes were added and you want to force-sync the ref immediately.
+- Use `tender memory export --artifact <artifact-id> --format jsonl --json` when a person needs a raw handoff bundle.
+- If `memory flush` fails, retry once after confirming remote config and artifact checkout access.
 
 ## Outbound Internet
 
