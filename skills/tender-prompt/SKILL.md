@@ -231,6 +231,13 @@ Then inspect local source code for analytics calls such as
 When adding or changing analytics events, register intended dashboard dimensions
 and metrics early so meaningful traffic is queryable from the start.
 
+For analytics instrumentation or funnel repair, treat the CLI and remote
+playbooks as the current write contract. If `tender capabilities --json`
+advertises an analytics authoring command, run it before editing events. If the
+remote playbook catalog includes `analytics-event-authoring`, fetch it and use
+that guidance for unit and flow metadata. Do not copy a stale analytics schema
+from this skill into app code.
+
 Read [Analytics CLI workflow](references/analytics-cli.md) before creating,
 exporting, or saving analytics dashboards for a customer.
 

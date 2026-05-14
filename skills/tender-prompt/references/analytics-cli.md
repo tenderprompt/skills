@@ -42,6 +42,23 @@ Use the response fields for:
 - existing saved dashboards and charts
 - observed event names, request paths, property keys, rough types, and counts
 
+If the CLI capabilities response advertises an analytics authoring command, run
+it before adding or changing event instrumentation:
+
+```bash
+tender app analytics authoring --json
+```
+
+If the remote playbook catalog includes `analytics-event-authoring`, fetch it
+for the current source-of-truth examples:
+
+```bash
+tender playbooks get analytics-event-authoring --json
+```
+
+Treat the CLI authoring response and remote playbook as authoritative when they
+exist. This reference should only carry stable guardrails.
+
 ## Source Inspection
 
 After reading capabilities, inspect the app source locally.
@@ -56,6 +73,52 @@ Use the code to understand what the app is doing, but keep suggestions grounded
 in observed data from `capabilities --include-catalog`. A source call that has
 never produced observed events is a weak suggestion unless the user explicitly
 wants to prepare for future traffic.
+
+## Event Authoring Guardrails
+
+Existing custom events are still useful for activity totals, milestone tables,
+and property breakdowns. Conversion funnels need extra top-level metadata so
+Tender can dedupe one journey through ordered steps.
+
+When instrumenting a conversion path:
+
+- Keep the business event name, such as `quiz_started`, `bundle_review_viewed`,
+  or `checkout_redirected`.
+- Add top-level `unit` metadata with a stable id for the whole journey.
+- Add top-level `flow` metadata for ordered conversion steps.
+- Put business dimensions and metrics in `properties`.
+- Do not put `unit` or `flow` inside `properties`.
+- Do not emit `event_type`, `unit_step`, or any `platform.*` event from app
+  code. Tender derives `unit_step` rows itself.
+- When also publishing Shopify Customer Events, still send Tender analytics for
+  the events needed in Tender dashboards.
+
+Minimal shape:
+
+```ts
+await this.env.__TP_ANALYTICS.invoke({
+  method: "track",
+  payload: {
+    event: "quiz_completed",
+    unit: { type: "quiz_attempt", id: quizAttemptId },
+    flow: {
+      id: "recommendation_quiz",
+      step: "quiz_completed",
+      order: 3,
+      role: "outcome",
+    },
+    properties: {
+      experiment_id: "quiz_copy_v1",
+      experiment_variant: "guided",
+      score: 84,
+    },
+  },
+});
+```
+
+Use `tender app doctor --dir . --json` after changing analytics code. Newer CLI
+versions should report malformed analytics payloads and missing unit/flow
+metadata as machine-readable diagnostics.
 
 ## Dashboard-Queryable Properties
 
