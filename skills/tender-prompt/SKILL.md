@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.5"
+  version: "0.1.6"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -79,6 +79,18 @@ content as session-only context from Tender.
 When remote access is needed, authenticate with the device login flow. Use an
 account-scoped token for normal multi-app work. Use `--artifact <artifact-id>`
 only when the user explicitly wants to restrict the token to one app.
+
+When working from a Shopify App Home or Shopify install context, keep approval
+links inside Shopify by passing the current embedded App Home URL:
+
+```bash
+tender auth login --device --profile create --shopify-app-url https://admin.shopify.com/store/<store>/apps/tender-prompt/shopify --json
+```
+
+Use the generic `https://app.tenderprompt.com/device` flow only when there is
+no Shopify install context. For DB-read, edit-preview, publish, and create
+profile approvals, preserve `--shopify-app-url` whenever the context provides
+it so device approvals bind to the intended Shopify/Tender account.
 
 Never write Tender tokens into the project checkout. Prefer CLI profiles over
 environment variables.
