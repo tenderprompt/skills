@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.6"
+  version: "0.1.7"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -80,11 +80,26 @@ When remote access is needed, authenticate with the device login flow. Use an
 account-scoped token for normal multi-app work. Use `--artifact <artifact-id>`
 only when the user explicitly wants to restrict the token to one app.
 
+For coding agents, use JSON mode with a saved profile. The login command should
+return an `authorization_pending` payload immediately; show the
+`verificationUriComplete` and `userCode` to the user, then run the returned
+`nextCommand` after the user approves:
+
+```bash
+tender auth login --device --profile edit-preview --artifact <artifact-id> --ttl 7d --save-profile agent --json
+tender auth status --profile agent --json
+```
+
+Do not treat the first command as a completed login. The saved profile is ready
+only after `auth status` exchanges the approved pending device code and returns
+`ok: true`.
+
 When working from a Shopify App Home or Shopify install context, keep approval
 links inside Shopify by passing the current embedded App Home URL:
 
 ```bash
-tender auth login --device --profile create --shopify-app-url https://admin.shopify.com/store/<store>/apps/tender-prompt/shopify --json
+tender auth login --device --profile create --shopify-app-url https://admin.shopify.com/store/<store>/apps/tender-prompt/shopify --save-profile account --json
+tender auth status --profile account --json
 ```
 
 Use the generic `https://app.tenderprompt.com/device` flow only when there is
