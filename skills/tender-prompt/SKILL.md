@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.7"
+  version: "0.1.8"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -140,6 +140,10 @@ or `tender app init <artifact-id> --dir <dir> --scaffold server-backed --preview
 - Read `AGENTS.md` first when it exists.
 - Read relevant `.agents/skills/*/SKILL.md` files before changing runtime,
   analytics, storage, bindings, preview, or publish behavior.
+- In Claude Code, follow the root `CLAUDE.md` and its `@AGENTS.md` import. If
+  that bridge is absent, read `AGENTS.md` explicitly. When the host has not
+  exposed `.agents/skills/` natively, explicitly read the relevant
+  `.agents/skills/<skill-name>/SKILL.md` files.
 - Keep deployable Tender App source in `app.json`, `src/`, `assets/`, and
   `bindings/`.
 - Keep repo-only context in `AGENTS.md`, `.agents/`, `.tenderprompt/`, docs,
