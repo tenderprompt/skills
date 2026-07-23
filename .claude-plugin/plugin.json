@@ -1,0 +1,17 @@
+{
+  "name": "tender-prompt",
+  "version": "0.1.8",
+  "description": "Create, edit, validate, preview, publish, and inspect Tender Apps through the Tender CLI.",
+  "author": {
+    "name": "Tender Prompt"
+  },
+  "homepage": "https://app.tenderprompt.com",
+  "repository": "https://github.com/tenderprompt/skills",
+  "license": "MIT",
+  "keywords": [
+    "tender-prompt",
+    "tender-app",
+    "coding-agent"
+  ],
+  "skills": "./skills/"
+}

@@ -1,0 +1,34 @@
+{
+  "name": "tender-prompt",
+  "version": "0.1.8",
+  "description": "Create, edit, validate, preview, publish, and inspect Tender Apps through the Tender CLI.",
+  "author": {
+    "name": "Tender Prompt"
+  },
+  "homepage": "https://app.tenderprompt.com",
+  "repository": "https://github.com/tenderprompt/skills",
+  "license": "MIT",
+  "keywords": [
+    "tender-prompt",
+    "tender-app",
+    "coding-agent"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Tender Prompt",
+    "shortDescription": "Build and operate Tender Apps with the Tender CLI.",
+    "longDescription": "Use provider-neutral Tender Prompt skills to create, edit, validate, preview, publish, and inspect Tender Apps through the Tender CLI.",
+    "developerName": "Tender Prompt",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://app.tenderprompt.com",
+    "defaultPrompt": [
+      "Create or update a Tender App and validate its preview.",
+      "Inspect Tender Prompt playbooks relevant to this app.",
+      "Analyze this Tender App through the Tender CLI."
+    ]
+  }
+}
