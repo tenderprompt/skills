@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.8"
+  version: "0.1.9"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -93,19 +93,6 @@ tender auth status --profile agent --json
 Do not treat the first command as a completed login. The saved profile is ready
 only after `auth status` exchanges the approved pending device code and returns
 `ok: true`.
-
-When working from a Shopify App Home or Shopify install context, keep approval
-links inside Shopify by passing the current embedded App Home URL:
-
-```bash
-tender auth login --device --profile create --shopify-app-url https://admin.shopify.com/store/<store>/apps/tender-prompt/shopify --save-profile account --json
-tender auth status --profile account --json
-```
-
-Use the generic `https://app.tenderprompt.com/device` flow only when there is
-no Shopify install context. For DB-read, edit-preview, publish, and create
-profile approvals, preserve `--shopify-app-url` whenever the context provides
-it so device approvals bind to the intended Shopify/Tender account.
 
 Never write Tender tokens into the project checkout. Prefer CLI profiles over
 environment variables.
