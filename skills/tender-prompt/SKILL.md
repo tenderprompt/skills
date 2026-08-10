@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.9"
+  version: "0.1.10"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -118,6 +118,21 @@ npm exec --yes @tenderprompt/cli@latest -- app init <artifact-id> --dir <dir> --
 
 The server-owned scaffold is the source of truth for empty apps. Do not copy,
 fork, or borrow another local Tender App checkout as a scaffold.
+
+## Generated Backend Contract
+
+For new server-backed Tender Apps:
+
+- Default-export a stateless `WorkerEntrypoint` from `src/server.ts`.
+- Do not add an app-local database. Keep durable business data in Shopify
+  metafields/metaobjects or another provider-owned system of record reached
+  through an approved binding.
+- Use Tender analytics for measurement, not operational persistence.
+- Do not call third-party URLs or set credential headers directly in generated
+  backend code. Put provider access and secrets behind declared bindings.
+
+Existing projects with a different retained source contract remain supported.
+Preserve that contract unless the user explicitly requests a migration.
 
 ## Inside A Tender App Checkout
 
