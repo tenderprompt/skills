@@ -1,11 +1,11 @@
 ---
 name: tender-prompt
-description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, inspect remote session-only playbooks, bootstrap project context, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
+description: "Work with Tender Prompt from a local coding-agent checkout: create or edit Tender App projects, inspect remote session-only playbooks, bootstrap project context, configure Shopify connector App Proxy routes, validate locally, send workspace heartbeat updates, push source through artifact Git, watch preview builds, publish after explicit user approval, or inspect artifact-scoped analytics through the Tender CLI."
 license: MIT
 compatibility: Requires the tender CLI, git, npm, and network access to a Tender Prompt instance.
 metadata:
   author: Tender Prompt
-  version: "0.1.10"
+  version: "0.1.11"
   hermes_tags: "Tender Prompt, Tender App, Git, Preview, Publish, Coding Agent"
 ---
 
@@ -133,6 +133,62 @@ For new server-backed Tender Apps:
 
 Existing projects with a different retained source contract remain supported.
 Preserve that contract unless the user explicitly requests a migration.
+
+## Shopify App Proxy
+
+Use Shopify App Proxy when a storefront needs a same-origin route backed by a
+server-backed Tender App. Fetch the connector playbook before planning or
+editing either source project:
+
+```bash
+tender capabilities --json
+tender playbooks get shopify-connector-custom-app --json
+```
+
+Declare the child route in the Tender App's `app.json`:
+
+```json
+{
+  "runtimeClass": "server_backed",
+  "server": "src/server.ts",
+  "shopifyAppProxy": {
+    "handle": "formula-finder",
+    "entryPath": "/shopify/app-proxy"
+  }
+}
+```
+
+The runtime handles `entryPath` and its suffixes. Use one connector-wide App
+Proxy root and a unique manifest handle for each linked runtime. A shopper uses
+the store URL `/apps/<connector-subpath>/<handle>/...`; Tender's absolute proxy
+destination is connector infrastructure, not the customer-facing URL. Separate
+storefront domains isolate different merchants that use the same storefront
+path.
+
+Use the account-scoped connector workflow:
+
+```bash
+tender connectors shopify runtime-link create <connector-id> --runtime-artifact <artifact-id> --profile account --json
+tender connectors shopify app-proxy enable <connector-id> --profile account --json
+tender connectors shopify source validate <connector-id> --runtime-artifact <artifact-id> --execute --profile account --json
+tender connectors shopify source deploy <connector-id> --runtime-artifact <artifact-id> --confirm deploy --profile account --json
+tender connectors shopify app-proxy reconcile <connector-id> --profile account --json
+tender connectors shopify app-proxy status <connector-id> --profile account --json
+```
+
+Copy the exact `[app_proxy]` destination printed by `app-proxy enable` into the
+connector's authoritative Shopify source. Include `write_app_proxy`, set
+`build.automatically_update_urls_on_dev = false`, and commit and push the
+connector source before control-plane validation or deployment. Never replace
+the printed destination with `application_url`, and do not bypass the workflow
+with Shopify CLI directly.
+
+Tender verifies Shopify's signed query, shop, and timestamp before runtime code
+runs. Treat the verified context as authenticated request context, not complete
+business authorization. Shopify's App Proxy signature does not cover the HTTP
+method or body. For mutations, authorize the verified customer against the
+target provider record, validate bounded input, and use provider-owned
+idempotency for retry-safe effects. Do not use cookies for App Proxy sessions.
 
 ## Inside A Tender App Checkout
 

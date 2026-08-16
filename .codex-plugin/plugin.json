@@ -1,6 +1,6 @@
 {
   "name": "tender-prompt",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Create, edit, validate, preview, publish, and inspect Tender Apps through the Tender CLI.",
   "author": {
     "name": "Tender Prompt"
